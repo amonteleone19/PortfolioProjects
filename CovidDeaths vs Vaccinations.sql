@@ -1,3 +1,4 @@
+--View Data
 Select *
 From [Port_Proj.v4]..CovidDeaths
 where continent is not null
@@ -8,13 +9,6 @@ From [Port_Proj.v4]..CovidVaccinations
 where continent is not null
 order by 3,4
 
---Select data that we are going to be using
-
---Select Location, date, total_cases, new_cases, total_deaths, population
-From [Port_Proj.v4]..CovidDeaths
-where continent is not null
-order by 1,2
-
 -- Looking at total cases vs total deaths
 --Shows likliehood of dying if you contract covid in your country
 Select Location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
@@ -23,14 +17,13 @@ where location like '%states%'
 order by 1,2
 
 -- Looking at total cases vs population
---Shows what percentage of population got covid
+--Shows what percentage of population was infected with covid
 Select Location, date, population, total_cases, (total_cases/population)*100 as CovidPercentage
 From [Port_Proj.v4]..CovidDeaths
 where location like '%states%'
 order by 1,2
 
 -- Looking at countries with highest infection rate compared to population
-
 Select Location, population, max(total_cases) as HighestInfectionCount, max((total_cases/population))*100 as PercentPopulationInfected
 From [Port_Proj.v4]..CovidDeaths
 --where location like '%states%'
@@ -46,15 +39,6 @@ Select Location, Max(cast(Total_deaths as int)) as TotalDeathCount
 From [Port_Proj.v4]..CovidDeaths
 --where location like '%states%'
 where continent is not null
-Group by location
-order by TotalDeathCount desc
-
---Let's break things down by continent
-
-Select location, Max(cast(Total_deaths as int)) as TotalDeathCount
-From [Port_Proj.v4]..CovidDeaths
---where location like '%states%'
-where continent is null
 Group by location
 order by TotalDeathCount desc
 
@@ -100,8 +84,7 @@ Select *, (RollingPeopleVaccinated/Population)*100
 From PopvsVac
 
 
-
--- Temp Table
+-- Using a Temp Table
 Drop Table if exists #PercentPopulationVaccinated
 Create table #PercentPopulationVaccinated
 (
@@ -122,7 +105,6 @@ Join [Port_Proj.v4]..CovidVaccinations vac
 	on dea.location = vac.location
 	and dea.date = vac.date
 	where dea.continent is not null
---order by 2,3
 
 Select *, (RollingPeopleVaccinated/Population) * 100
 From #PercentPopulationVaccinated
@@ -138,4 +120,3 @@ Join [Port_Proj.v4]..CovidVaccinations vac
 	on dea.location = vac.location
 	and dea.date = vac.date
 where dea.continent is not null
---order by 2,3
